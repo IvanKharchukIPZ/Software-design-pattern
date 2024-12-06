@@ -1,0 +1,41 @@
+#include <iostream>
+
+using namespace std;
+
+class Subject {
+public:
+    virtual void request() const = 0;
+    virtual ~Subject() = default;
+};
+
+class RealSubject : public Subject {
+public:
+    void request() const override {
+        cout << "RealSubject: Обробка запиту." << endl;
+    }
+};
+
+class Proxy : public Subject {
+private:
+    RealSubject* realSubject;
+
+public:
+    Proxy() : realSubject(new RealSubject()) {}
+
+    ~Proxy() {
+        delete realSubject;
+    }
+
+    void request() const override {
+        cout << "Proxy: Перевірка доступу перед делегуванням запиту RealSubject." << endl;
+        realSubject->request();
+        cout << "Proxy: Логування після делегування запиту RealSubject." << endl;
+    }
+};
+
+int main() {
+    Proxy proxy;
+    proxy.request();
+
+    return 0;
+}
