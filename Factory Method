@@ -1,0 +1,56 @@
+#include <iostream>
+#include <memory>
+
+using namespace std;
+
+class Product {
+public:
+    virtual void use() const = 0;
+    virtual ~Product() = default;
+};
+
+class ConcreteProductA : public Product {
+public:
+    void use() const override {
+        cout << "Using ConcreteProductA" << endl;
+    }
+};
+
+class ConcreteProductB : public Product {
+public:
+    void use() const override {
+        cout << "Using ConcreteProductB" << endl;
+    }
+};
+
+class Creator {
+public:
+    virtual unique_ptr<Product> createProduct() const = 0;
+    virtual ~Creator() = default;
+};
+
+class ConcreteCreatorA : public Creator {
+public:
+    unique_ptr<Product> createProduct() const override {
+        return make_unique<ConcreteProductA>();
+    }
+};
+
+class ConcreteCreatorB : public Creator {
+public:
+    unique_ptr<Product> createProduct() const override {
+        return make_unique<ConcreteProductB>();
+    }
+};
+
+int main() {
+    unique_ptr<Creator> creatorA = make_unique<ConcreteCreatorA>();
+    unique_ptr<Product> productA = creatorA->createProduct();
+    productA->use();
+
+    unique_ptr<Creator> creatorB = make_unique<ConcreteCreatorB>();
+    unique_ptr<Product> productB = creatorB->createProduct();
+    productB->use();
+
+    return 0;
+}
