@@ -1,0 +1,48 @@
+#include <iostream>
+#include <memory>
+
+using namespace std;
+
+class Prototype {
+public:
+    virtual unique_ptr<Prototype> clone() const = 0;
+    virtual void use() const = 0;
+    virtual ~Prototype() = default;
+};
+
+class ConcretePrototype1 : public Prototype {
+public:
+    unique_ptr<Prototype> clone() const override {
+        return make_unique<ConcretePrototype1>(*this);
+    }
+
+    void use() const override {
+        cout << "Using ConcretePrototype1" << endl;
+    }
+};
+
+class ConcretePrototype2 : public Prototype {
+public:
+    unique_ptr<Prototype> clone() const override {
+        return make_unique<ConcretePrototype2>(*this);
+    }
+
+    void use() const override {
+        cout << "Using ConcretePrototype2" << endl;
+    }
+};
+
+int main() {
+    unique_ptr<Prototype> prototype1 = make_unique<ConcretePrototype1>();
+    unique_ptr<Prototype> prototype2 = make_unique<ConcretePrototype2>();
+
+    unique_ptr<Prototype> clone1 = prototype1->clone();
+    unique_ptr<Prototype> clone2 = prototype2->clone();
+
+    prototype1->use(); 
+    prototype2->use(); 
+    clone1->use();    
+    clone2->use();     
+
+    return 0;
+}
