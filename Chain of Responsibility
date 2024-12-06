@@ -1,0 +1,70 @@
+#include <iostream>
+#include <memory>
+
+using namespace std;
+
+class Handler {
+public:
+    virtual Handler* setNext(Handler* handler) = 0;
+    virtual string handle(const string& request) = 0;
+};
+
+class AbstractHandler : public Handler {
+private:
+    Handler* nextHandler;
+
+public:
+    AbstractHandler() : nextHandler(nullptr) {}
+
+    Handler* setNext(Handler* handler) override {
+        nextHandler = handler;
+        return handler;
+    }
+
+    string handle(const string& request) override {
+        if (nextHandler) {
+            return nextHandler->handle(request);
+        }
+        return {};
+    }
+};
+
+class ConcreteHandler1 : public AbstractHandler {
+public:
+    string handle(const string& request) override {
+        if (request == "Request1") {
+            return "ConcreteHandler1 обробив запит " + request;
+        } else {
+            return AbstractHandler::handle(request);
+        }
+    }
+};
+
+class ConcreteHandler2 : public AbstractHandler {
+public:
+    string handle(const string& request) override {
+        if (request == "Request2") {
+            return "ConcreteHandler2 обробив запит " + request;
+        } else {
+            return AbstractHandler::handle(request);
+        }
+    }
+};
+
+int main() {
+    ConcreteHandler1 handler1;
+    ConcreteHandler2 handler2;
+
+    handler1.setNext(&handler2);
+
+    string request = "Request1";
+    cout << handler1.handle(request) << endl;
+
+    request = "Request2";
+    cout << handler1.handle(request) << endl;
+
+    request = "Request3";
+    cout << handler1.handle(request) << endl;
+
+    return 0;
+}
