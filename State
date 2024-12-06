@@ -1,0 +1,55 @@
+#include <iostream>
+#include <memory>
+
+using namespace std;
+
+class Context;
+
+class State {
+public:
+    virtual void handle(Context& context) = 0;
+    virtual ~State() = default;
+};
+
+class Context {
+private:
+    shared_ptr<State> state;
+
+public:
+    Context(shared_ptr<State> state) : state(state) {}
+
+    void setState(shared_ptr<State> state) {
+        this->state = state;
+    }
+
+    void request() {
+        state->handle(*this);
+    }
+};
+
+class ConcreteStateA : public State {
+public:
+    void handle(Context& context) override {
+        cout << "ConcreteStateA обробляє запит і змінює стан на ConcreteStateB." << endl;
+        context.setState(make_shared<ConcreteStateB>());
+    }
+};
+
+class ConcreteStateB : public State {
+public:
+    void handle(Context& context) override {
+        cout << "ConcreteStateB обробляє запит і змінює стан на ConcreteStateA." << endl;
+        context.setState(make_shared<ConcreteStateA>());
+    }
+};
+
+int main() {
+    auto stateA = make_shared<ConcreteStateA>();
+    Context context(stateA);
+
+    context.request();
+    context.request();
+    context.request();
+
+    return 0;
+}
