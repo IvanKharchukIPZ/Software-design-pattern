@@ -1,0 +1,77 @@
+#include <iostream>
+#include <string>
+#include <vector>
+#include <memory>
+
+using namespace std;
+
+class Colleague;
+
+class Mediator {
+public:
+    virtual void sendMessage(const string& message, Colleague* colleague) = 0;
+};
+
+class Colleague {
+protected:
+    Mediator* mediator;
+
+public:
+    Colleague(Mediator* mediator) : mediator(mediator) {}
+
+    virtual void receiveMessage(const string& message) = 0;
+    virtual void sendMessage(const string& message) {
+        mediator->sendMessage(message, this);
+    }
+};
+
+class ConcreteMediator : public Mediator {
+private:
+    vector<shared_ptr<Colleague>> colleagues;
+
+public:
+    void addColleague(shared_ptr<Colleague> colleague) {
+        colleagues.push_back(colleague);
+    }
+
+    void sendMessage(const string& message, Colleague* sender) override {
+        for (const auto& colleague : colleagues) {
+            if (colleague.get() != sender) {
+                colleague->receiveMessage(message);
+            }
+        }
+    }
+};
+
+class ConcreteColleague1 : public Colleague {
+public:
+    ConcreteColleague1(Mediator* mediator) : Colleague(mediator) {}
+
+    void receiveMessage(const string& message) override {
+        cout << "ConcreteColleague1 отримав повідомлення: " << message << endl;
+    }
+};
+
+class ConcreteColleague2 : public Colleague {
+public:
+    ConcreteColleague2(Mediator* mediator) : Colleague(mediator) {}
+
+    void receiveMessage(const string& message) override {
+        cout << "ConcreteColleague2 отримав повідомлення: " << message << endl;
+    }
+};
+
+int main() {
+    ConcreteMediator mediator;
+
+    auto colleague1 = make_shared<ConcreteColleague1>(&mediator);
+    auto colleague2 = make_shared<ConcreteColleague2>(&mediator);
+
+    mediator.addColleague(colleague1);
+    mediator.addColleague(colleague2);
+
+    colleague1->sendMessage("Привіт від колеги 1");
+    colleague2->sendMessage("Привіт від колеги 2");
+
+    return 0;
+}
