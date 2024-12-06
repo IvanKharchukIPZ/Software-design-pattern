@@ -1,0 +1,83 @@
+#include <iostream>
+#include <string>
+
+using namespace std;
+
+class Product {
+public:
+    void setPartA(const string& partA) {
+        this->partA = partA;
+    }
+    
+    void setPartB(const string& partB) {
+        this->partB = partB;
+    }
+    
+    void show() const {
+        cout << "Product Parts: " << partA << ", " << partB << endl;
+    }
+
+private:
+    string partA;
+    string partB;
+};
+
+class Builder {
+public:
+    virtual void buildPartA() = 0;
+    virtual void buildPartB() = 0;
+    virtual Product* getProduct() = 0;
+    virtual ~Builder() = default;
+};
+
+class ConcreteBuilder : public Builder {
+public:
+    ConcreteBuilder() {
+        product = new Product();
+    }
+    
+    void buildPartA() override {
+        product->setPartA("Part A");
+    }
+    
+    void buildPartB() override {
+        product->setPartB("Part B");
+    }
+    
+    Product* getProduct() override {
+        return product;
+    }
+
+private:
+    Product* product;
+};
+
+class Director {
+public:
+    void setBuilder(Builder* builder) {
+        this->builder = builder;
+    }
+    
+    void construct() {
+        builder->buildPartA();
+        builder->buildPartB();
+    }
+
+private:
+    Builder* builder;
+};
+
+int main() {
+    Director director;
+    ConcreteBuilder builder;
+
+    director.setBuilder(&builder);
+    director.construct();
+
+    Product* product = builder.getProduct();
+    product->show();
+
+    delete product;
+
+    return 0;
+}
