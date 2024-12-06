@@ -1,0 +1,67 @@
+#include <iostream>
+#include <vector>
+#include <memory>
+
+using namespace std;
+
+class ConcreteElementA;
+class ConcreteElementB;
+
+class Visitor {
+public:
+    virtual void visitConcreteElementA(ConcreteElementA* element) = 0;
+    virtual void visitConcreteElementB(ConcreteElementB* element) = 0;
+    virtual ~Visitor() = default;
+};
+
+class Element {
+public:
+    virtual void accept(Visitor* visitor) = 0;
+    virtual ~Element() = default;
+};
+
+class ConcreteElementA : public Element {
+public:
+    void accept(Visitor* visitor) override {
+        visitor->visitConcreteElementA(this);
+    }
+
+    void operationA() const {
+        cout << "ConcreteElementA операція A." << endl;
+    }
+};
+
+class ConcreteElementB : public Element {
+public:
+    void accept(Visitor* visitor) override {
+        visitor->visitConcreteElementB(this);
+    }
+
+    void operationB() const {
+        cout << "ConcreteElementB операція B." << endl;
+    }
+};
+
+class ConcreteVisitor : public Visitor {
+public:
+    void visitConcreteElementA(ConcreteElementA* element) override {
+        cout << "ConcreteVisitor відвідує ConcreteElementA." << endl;
+        element->operationA();
+    }
+
+    void visitConcreteElementB(ConcreteElementB* element) override {
+        cout << "ConcreteVisitor відвідує ConcreteElementB." << endl;
+        element->operationB();
+    }
+};
+
+int main() {
+    vector<shared_ptr<Element>> elements = { make_shared<ConcreteElementA>(), make_shared<ConcreteElementB>() };
+    ConcreteVisitor visitor;
+
+    for (auto& element : elements) {
+        element->accept(&visitor);
+    }
+
+    return 0;
+}
