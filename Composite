@@ -1,0 +1,57 @@
+#include <iostream>
+#include <vector>
+#include <memory>
+
+using namespace std;
+
+class Component {
+public:
+    virtual void operation() const = 0;
+    virtual void add(shared_ptr<Component> component) {}
+    virtual void remove(shared_ptr<Component> component) {}
+    virtual ~Component() = default;
+};
+
+class Leaf : public Component {
+public:
+    void operation() const override {
+        cout << "Leaf: операція." << endl;
+    }
+};
+
+class Composite : public Component {
+private:
+    vector<shared_ptr<Component>> children;
+
+public:
+    void add(shared_ptr<Component> component) override {
+        children.push_back(component);
+    }
+
+    void remove(shared_ptr<Component> component) override {
+        children.erase(remove(children.begin(), children.end(), component), children.end());
+    }
+
+    void operation() const override {
+        cout << "Composite: операція з дітьми." << endl;
+        for (const auto& child : children) {
+            child->operation();
+        }
+    }
+};
+
+int main() {
+    shared_ptr<Component> leaf1 = make_shared<Leaf>();
+    shared_ptr<Component> leaf2 = make_shared<Leaf>();
+    shared_ptr<Component> composite1 = make_shared<Composite>();
+    shared_ptr<Component> composite2 = make_shared<Composite>();
+
+    composite1->add(leaf1);
+    composite1->add(leaf2);
+    composite2->add(composite1);
+
+    cout << "Виконуємо операцію для composite2:" << endl;
+    composite2->operation();
+
+    return 0;
+}
