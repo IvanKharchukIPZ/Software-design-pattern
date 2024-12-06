@@ -1,0 +1,55 @@
+#include <iostream>
+#include <memory>
+
+using namespace std;
+
+class Component {
+public:
+    virtual void operation() const = 0;
+    virtual ~Component() = default;
+};
+
+class ConcreteComponent : public Component {
+public:
+    void operation() const override {
+        cout << "ConcreteComponent: операція." << endl;
+    }
+};
+
+class Decorator : public Component {
+protected:
+    shared_ptr<Component> component;
+
+public:
+    Decorator(shared_ptr<Component> comp) : component(comp) {}
+};
+
+class ConcreteDecoratorA : public Decorator {
+public:
+    ConcreteDecoratorA(shared_ptr<Component> comp) : Decorator(comp) {}
+
+    void operation() const override {
+        component->operation();
+        cout << "ConcreteDecoratorA: додаткова операція A." << endl;
+    }
+};
+
+class ConcreteDecoratorB : public Decorator {
+public:
+    ConcreteDecoratorB(shared_ptr<Component> comp) : Decorator(comp) {}
+
+    void operation() const override {
+        component->operation();
+        cout << "ConcreteDecoratorB: додаткова операція B." << endl;
+    }
+};
+
+int main() {
+    shared_ptr<Component> simple = make_shared<ConcreteComponent>();
+    shared_ptr<Component> decoratedA = make_shared<ConcreteDecoratorA>(simple);
+    shared_ptr<Component> decoratedB = make_shared<ConcreteDecoratorB>(decoratedA);
+
+    decoratedB->operation();
+
+    return 0;
+}
