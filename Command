@@ -1,0 +1,45 @@
+#include <iostream>
+#include <vector>
+#include <memory>
+
+using namespace std;
+
+class Command {
+public:
+    virtual void execute() const = 0;
+    virtual ~Command() = default;
+};
+
+class LightOnCommand : public Command {
+public:
+    void execute() const override {
+        cout << "Light is ON" << endl;
+    }
+};
+
+class LightOffCommand : public Command {
+public:
+    void execute() const override {
+        cout << "Light is OFF" << endl;
+    }
+};
+
+class Invoker {
+private:
+    vector<unique_ptr<Command>> history;
+
+public:
+    void storeAndExecute(unique_ptr<Command> command) {
+        command->execute();
+        history.push_back(move(command));
+    }
+};
+
+int main() {
+    Invoker invoker;
+    
+    invoker.storeAndExecute(make_unique<LightOnCommand>());
+    invoker.storeAndExecute(make_unique<LightOffCommand>());
+    
+    return 0;
+}
