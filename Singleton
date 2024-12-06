@@ -1,0 +1,30 @@
+#include <iostream>
+
+using namespace std;
+
+class Singleton {
+public:
+    static Singleton& getInstance() {
+        static Singleton instance;
+        return instance;
+    }
+
+    void showMessage() const {
+        cout << "Hello, I am a Singleton!" << endl;
+    }
+
+private:
+    Singleton() = default;
+    Singleton(const Singleton&) = delete;
+    Singleton& operator=(const Singleton&) = delete;
+};
+
+int main() {
+    Singleton& singleton1 = Singleton::getInstance();
+    singleton1.showMessage();
+
+    Singleton& singleton2 = Singleton::getInstance();
+    singleton2.showMessage();
+
+    return 0;
+}
