@@ -1,0 +1,73 @@
+#include <iostream>
+#include <string>
+#include <vector>
+
+using namespace std;
+
+class Memento {
+public:
+    Memento(const string& state) : state(state) {}
+
+    string getState() const {
+        return state;
+    }
+
+private:
+    string state;
+};
+
+class Originator {
+public:
+    void setState(const string& state) {
+        this->state = state;
+        cout << "Originator: Змінено стан на " << state << endl;
+    }
+
+    string getState() const {
+        return state;
+    }
+
+    Memento saveStateToMemento() {
+        return Memento(state);
+    }
+
+    void restoreStateFromMemento(const Memento& memento) {
+        state = memento.getState();
+        cout << "Originator: Відновлено стан з знімка " << state << endl;
+    }
+
+private:
+    string state;
+};
+
+class Caretaker {
+public:
+    void addMemento(const Memento& memento) {
+        mementos.push_back(memento);
+    }
+
+    Memento getMemento(int index) const {
+        return mementos.at(index);
+    }
+
+private:
+    vector<Memento> mementos;
+};
+
+int main() {
+    Originator originator;
+    Caretaker caretaker;
+
+    originator.setState("State1");
+    caretaker.addMemento(originator.saveStateToMemento());
+
+    originator.setState("State2");
+    caretaker.addMemento(originator.saveStateToMemento());
+
+    originator.setState("State3");
+
+    originator.restoreStateFromMemento(caretaker.getMemento(0));
+    originator.restoreStateFromMemento(caretaker.getMemento(1));
+
+    return 0;
+}
