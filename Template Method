@@ -1,0 +1,48 @@
+#include <iostream>
+
+using namespace std;
+
+class AbstractClass {
+public:
+    void templateMethod() const {
+        baseOperation1();
+        requiredOperation1();
+        baseOperation2();
+        requiredOperation2();
+        baseOperation3();
+    }
+
+protected:
+    void baseOperation1() const {
+        cout << "AbstractClass: Базова операція 1" << endl;
+    }
+
+    void baseOperation2() const {
+        cout << "AbstractClass: Базова операція 2" << endl;
+    }
+
+    void baseOperation3() const {
+        cout << "AbstractClass: Базова операція 3" << endl;
+    }
+
+    virtual void requiredOperation1() const = 0;
+    virtual void requiredOperation2() const = 0;
+};
+
+class ConcreteClass : public AbstractClass {
+protected:
+    void requiredOperation1() const override {
+        cout << "ConcreteClass: Обов'язкова операція 1" << endl;
+    }
+
+    void requiredOperation2() const override {
+        cout << "ConcreteClass: Обов'язкова операція 2" << endl;
+    }
+};
+
+int main() {
+    ConcreteClass concrete;
+    concrete.templateMethod();
+
+    return 0;
+}
