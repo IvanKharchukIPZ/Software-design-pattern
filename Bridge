@@ -1,0 +1,63 @@
+#include <iostream>
+
+using namespace std;
+
+class Implementor {
+public:
+    virtual void operationImpl() const = 0;
+};
+
+class ConcreteImplementorA : public Implementor {
+public:
+    void operationImpl() const override {
+        cout << "ConcreteImplementorA: Реалізація." << endl;
+    }
+};
+
+class ConcreteImplementorB : public Implementor {
+public:
+    void operationImpl() const override {
+        cout << "ConcreteImplementorB: Реалізація." << endl;
+    }
+};
+
+class Abstraction {
+protected:
+    Implementor* implementor;
+
+public:
+    Abstraction(Implementor* imp) : implementor(imp) {}
+
+    virtual void operation() const {
+        implementor->operationImpl();
+    }
+
+    virtual ~Abstraction() = default;
+};
+
+class ExtendedAbstraction : public Abstraction {
+public:
+    ExtendedAbstraction(Implementor* imp) : Abstraction(imp) {}
+
+    void operation() const override {
+        cout << "ExtendedAbstraction: Розширена абстракція делегує виклик реалізації.\n";
+        implementor->operationImpl();
+    }
+};
+
+int main() {
+    Implementor* impA = new ConcreteImplementorA();
+    Abstraction* absA = new Abstraction(impA);
+    absA->operation();
+
+    Implementor* impB = new ConcreteImplementorB();
+    Abstraction* absB = new ExtendedAbstraction(impB);
+    absB->operation();
+
+    delete absA;
+    delete impA;
+    delete absB;
+    delete impB;
+
+    return 0;
+}
