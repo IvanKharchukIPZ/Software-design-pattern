@@ -1,0 +1,39 @@
+#include <iostream>
+
+using namespace std;
+
+class Target {
+public:
+    virtual void request() const {
+        cout << "Target: стандартний запит." << endl;
+    }
+};
+
+class Adaptee {
+public:
+    void specificRequest() const {
+        cout << "Adaptee: специфічний запит." << endl;
+    }
+};
+
+class Adapter : public Target {
+private:
+    Adaptee* adaptee;
+
+public:
+    Adapter(Adaptee* a) : adaptee(a) {}
+
+    void request() const override {
+        adaptee->specificRequest();
+    }
+};
+
+int main() {
+    Adaptee adaptee;
+    Adapter adapter(&adaptee);
+
+    cout << "Клієнт працює з адаптером через цільовий інтерфейс:" << endl;
+    adapter.request();
+
+    return 0;
+}
