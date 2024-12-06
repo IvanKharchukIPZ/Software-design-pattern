@@ -1,0 +1,50 @@
+#include <iostream>
+#include <memory>
+
+using namespace std;
+
+class Strategy {
+public:
+    virtual void execute() const = 0;
+    virtual ~Strategy() = default;
+};
+
+class ConcreteStrategyA : public Strategy {
+public:
+    void execute() const override {
+        cout << "Виконання стратегії A" << endl;
+    }
+};
+
+class ConcreteStrategyB : public Strategy {
+public:
+    void execute() const override {
+        cout << "Виконання стратегії B" << endl;
+    }
+};
+
+class Context {
+private:
+    unique_ptr<Strategy> strategy;
+
+public:
+    void setStrategy(unique_ptr<Strategy> strategy) {
+        this->strategy = move(strategy);
+    }
+
+    void executeStrategy() const {
+        strategy->execute();
+    }
+};
+
+int main() {
+    Context context;
+    
+    context.setStrategy(make_unique<ConcreteStrategyA>());
+    context.executeStrategy();
+    
+    context.setStrategy(make_unique<ConcreteStrategyB>());
+    context.executeStrategy();
+    
+    return 0;
+}
