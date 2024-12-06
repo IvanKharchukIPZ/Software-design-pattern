@@ -1,0 +1,82 @@
+#include <iostream>
+#include <vector>
+#include <memory>
+
+using namespace std;
+
+class Observer {
+public:
+    virtual void update(const string& message_from_subject) = 0;
+};
+
+class Subject {
+public:
+    virtual void attach(shared_ptr<Observer> observer) = 0;
+    virtual void detach(shared_ptr<Observer> observer) = 0;
+    virtual void notify() = 0;
+};
+
+class ConcreteSubject : public Subject {
+private:
+    vector<shared_ptr<Observer>> observers;
+    string message;
+
+public:
+    void attach(shared_ptr<Observer> observer) override {
+        observers.push_back(observer);
+    }
+
+    void detach(shared_ptr<Observer> observer) override {
+        observers.erase(remove(observers.begin(), observers.end(), observer), observers.end());
+    }
+
+    void notify() override {
+        for (const auto& observer : observers) {
+            observer->update(message);
+        }
+    }
+
+    void createMessage(const string& message) {
+        this->message = message;
+        notify();
+    }
+};
+
+class ConcreteObserver : public Observer {
+private:
+    string message_from_subject;
+    ConcreteSubject& subject;
+    static int static_number;
+    int number;
+
+public:
+    ConcreteObserver(ConcreteSubject& subject) : subject(subject) {
+        this->number = ++ConcreteObserver::static_number;
+        this->subject.attach(shared_ptr<ConcreteObserver>(this));
+    }
+
+    void update(const string& message_from_subject) override {
+        this->message_from_subject = message_from_subject;
+        cout << "Observer " << this->number << ": отримано повідомлення " << this->message_from_subject << endl;
+    }
+
+    void removeMeFromTheList() {
+        subject.detach(shared_ptr<ConcreteObserver>(this));
+        cout << "Observer " << this->number << " видалено з списку." << endl;
+    }
+};
+
+int ConcreteObserver::static_number = 0;
+
+int main() {
+    ConcreteSubject subject;
+
+    auto observer1 = make_shared<ConcreteObserver>(subject);
+    auto observer2 = make_shared<ConcreteObserver>(subject);
+
+    subject.createMessage("Привіт, Спостерігачі!");
+    observer2->removeMeFromTheList();
+    subject.createMessage("Тільки один Спостерігач");
+
+    return 0;
+}
