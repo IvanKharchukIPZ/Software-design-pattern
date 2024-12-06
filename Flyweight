@@ -1,0 +1,46 @@
+#include <iostream>
+#include <unordered_map>
+#include <memory>
+
+using namespace std;
+
+class Flyweight {
+public:
+    Flyweight(const string& sharedState) : sharedState(sharedState) {}
+
+    void operation(const string& uniqueState) const {
+        cout << "Flyweight: Спільний стан = " << sharedState
+             << ", Унікальний стан = " << uniqueState << endl;
+    }
+
+private:
+    string sharedState;
+};
+
+class FlyweightFactory {
+public:
+    shared_ptr<Flyweight> getFlyweight(const string& sharedState) {
+        if (flyweights.find(sharedState) == flyweights.end()) {
+            flyweights[sharedState] = make_shared<Flyweight>(sharedState);
+        }
+        return flyweights[sharedState];
+    }
+
+private:
+    unordered_map<string, shared_ptr<Flyweight>> flyweights;
+};
+
+int main() {
+    FlyweightFactory factory;
+
+    auto flyweight1 = factory.getFlyweight("Shared State 1");
+    flyweight1->operation("Unique State A");
+
+    auto flyweight2 = factory.getFlyweight("Shared State 1");
+    flyweight2->operation("Unique State B");
+
+    auto flyweight3 = factory.getFlyweight("Shared State 2");
+    flyweight3->operation("Unique State C");
+
+    return 0;
+}
